@@ -1,3 +1,4 @@
-search_parameters:
+science_direct_search:
+  uri: "https://api.elsevier.com/content/search/scidir"
   query:
     affil: "university of cincinnati"
