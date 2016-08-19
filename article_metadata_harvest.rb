@@ -6,7 +6,7 @@ class ArticleMetadataHarvest
 
   attr_accessor :count, :current_page, :number_of_pages, :page, :worksheet, :workbook, :p
 
-  def initialize(page = 1, count = 5)
+  def initialize(page = 1, count = 200)
     @p = Axlsx::Package.new
     @workbook = start_workbook
     @worksheet = start_worksheet
@@ -47,7 +47,7 @@ class ArticleMetadataHarvest
 
   def add_row(result)
     @worksheet << column_keys.collect do |key|
-      result[column_mapping_value(key)]
+      column_mapping_value(key).call(result)
     end
   end
 
@@ -63,9 +63,26 @@ class ArticleMetadataHarvest
 
   def column_mapping
     [
-      {title: "dc:title"},
-      {authors: "dc:creator"},
-      {publication_name: "prism:publicationName"}
+      { title: lambda { |result| result["dc:title"] } },
+      { authors: lambda do |result|
+        result["authors"]["author"].collect do |author|
+          "#{author["surname"]}, #{author["given-name"]}"
+        end.join(";")
+      end },
+      { publication_name: lambda { |result| result["prism:publicationName"] } },
+      { publication_type: lambda { |result| result["pubType"] } },
+      { issn: lambda { |result| result["prism:issn"] } },
+      { cover_date: lambda { |result| result["prism:coverDate"][0]["$"] } },
+      { oa: lambda { |result| result["openaccess"] } },
+      { oa_article: lambda { |result| result["openaccessArticle"] } },
+      { oa_license: lambda { |result| result["openaccessUserLicense"] } },
+      { link: lambda do |result|
+          result["link"].each do |l|
+            return l["@href"] if l["@ref"] == "scidir"
+          end
+      end },
+      { doi: lambda { |result| result["dc:identifier"] } }
+
     ]
   end
 
