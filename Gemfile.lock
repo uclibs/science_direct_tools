@@ -13,8 +13,13 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (7.1.1)
+    axlsx (2.0.1)
+      htmlentities (~> 4.3.1)
+      nokogiri (>= 1.4.1)
+      rubyzip (~> 1.0.0)
     byebug (9.0.5)
     concurrent-ruby (1.0.2)
+    htmlentities (4.3.4)
     i18n (0.7.0)
     mini_portile2 (2.1.0)
     minitest (5.9.0)
@@ -22,6 +27,7 @@ GEM
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
     pkg-config (1.1.7)
+    rubyzip (1.0.0)
     sqlite3 (1.3.11)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
@@ -33,8 +39,8 @@ PLATFORMS
 DEPENDENCIES
   activemodel
   activerecord
+  axlsx
   byebug
-  nokogiri
   sqlite3
 
 RUBY VERSION

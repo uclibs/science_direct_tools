@@ -1,4 +1,5 @@
 science_direct_search:
-  uri: "https://api.elsevier.com/content/search/scidir"
+  host: "http://api.elsevier.com"
+  path: "/content/search/scidir"
   query:
     affil: "university of cincinnati"

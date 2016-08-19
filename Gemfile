@@ -5,5 +5,5 @@ ruby '2.3.1'
 gem "sqlite3"
 gem "activerecord"
 gem "activemodel"
-gem "nokogiri"
+gem "axlsx"
 gem "byebug"

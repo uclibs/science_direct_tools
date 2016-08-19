@@ -7,23 +7,26 @@ class ArticleResultPage
   SEARCH_TYPE = "science_direct_search"
   RESULT_TYPE = "application/json"
 
-  attr_accessor :page
+  attr_accessor :page, :start_number, :count
 
   def initialize(start_number = 0, count = 200) #the max count is 200
-    @page = JSON.parse(search(start_number.to_s, count.to_s).response.body)["search-results"]
+    @start_number = start_number.to_s
+    @count = count.to_s
+    @page = JSON.parse(search.response.body)["search-results"]
   end
 
   #private
 
-  def search(start_number, count)
-    Net::HTTP.get_response(uri(start_number, count))
+  def search
+    Net::HTTP.get_response(uri)
   end
 
-  def uri(start_number, count)
-    URI.parse(search_config["uri"] + "?" +
+  def uri
+    URI.parse(search_config["host"] +
+              search_config["path"] + "?" +
               "query=" + search_query + "&" +
-              "start=" + start_number + "&" +
-              "count=" + count + "&" +
+              "start=" + @start_number + "&" +
+              "count=" + @count + "&" +
               "apiKey=" + api_key)
   end
 
