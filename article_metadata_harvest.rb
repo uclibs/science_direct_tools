@@ -70,12 +70,16 @@ class ArticleMetadataHarvest
         end.join(";")
       end },
       { publication_name: lambda { |result| result["prism:publicationName"] } },
-      { publication_type: lambda { |result| result["pubType"] } },
+      { aggregation_type: lambda { |result| result["prism:aggregationType"] } },
       { issn: lambda { |result| result["prism:issn"] } },
       { cover_date: lambda { |result| result["prism:coverDate"][0]["$"] } },
+      { copyright: lambda { |result| result["prism:copyright"] } },
       { oa: lambda { |result| result["openaccess"] } },
       { oa_article: lambda { |result| result["openaccessArticle"] } },
       { oa_license: lambda { |result| result["openaccessUserLicense"] } },
+      { scopus_id: lambda { |result| result["scopus-id"] } },
+      { scopus_eid: lambda { |result| result["scopus-eid"] } },
+      { pubmed_id: lambda { |result| result["pubmed-id"] } },
       { link: lambda do |result|
           result["link"].each do |l|
             return l["@href"] if l["@ref"] == "scidir"
