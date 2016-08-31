@@ -46,9 +46,17 @@ class ArticleMetadataHarvest
   end
 
   def add_row(result)
-    @worksheet << column_keys.collect do |key|
+    @worksheet.add_row(parsed_row(result), types: set_each_column_as_string)
+  end
+
+  def parsed_row(result)
+    column_keys.collect do |key|
       column_mapping_value(key).call(result)
     end
+  end
+
+  def set_each_column_as_string
+    column_mapping.length.times.collect { :string }
   end
 
   def column_keys
@@ -64,7 +72,8 @@ class ArticleMetadataHarvest
   def column_mapping
     [
       { title: lambda { |result| result["dc:title"] } },
-      { authors: lambda do |result|
+      { first_author: lambda { |result| result["dc:creator"] } },
+      { all_authors: lambda do |result|
         result["authors"]["author"].collect do |author|
           "#{author["surname"]}, #{author["given-name"]}"
         end.join(";")
@@ -72,6 +81,7 @@ class ArticleMetadataHarvest
       { publication_name: lambda { |result| result["prism:publicationName"] } },
       { aggregation_type: lambda { |result| result["prism:aggregationType"] } },
       { issn: lambda { |result| result["prism:issn"] } },
+      { isbn: lambda { |result| result["prism:isbn"] } },
       { cover_date: lambda { |result| result["prism:coverDate"][0]["$"] } },
       { copyright: lambda { |result| result["prism:copyright"] } },
       { oa: lambda { |result| result["openaccess"] } },
@@ -80,6 +90,7 @@ class ArticleMetadataHarvest
       { scopus_id: lambda { |result| result["scopus-id"] } },
       { scopus_eid: lambda { |result| result["scopus-eid"] } },
       { pubmed_id: lambda { |result| result["pubmed-id"] } },
+      { pii: lambda { |result| result["pii"] } },
       { link: lambda do |result|
           result["link"].each do |l|
             return l["@href"] if l["@ref"] == "scidir"
