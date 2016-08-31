@@ -25,6 +25,7 @@ class ArticleResultPage
     URI.parse(search_config["host"] +
               search_config["path"] + "?" +
               "query=" + search_query + "&" +
+              "view=" + "COMPLETE" + "&" +
               "start=" + @start_number + "&" +
               "count=" + @count + "&" +
               "apiKey=" + api_key)
