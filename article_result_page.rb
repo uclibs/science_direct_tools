@@ -7,11 +7,12 @@ class ArticleResultPage
   SEARCH_TYPE = "science_direct_search"
   RESULT_TYPE = "application/json"
 
-  attr_accessor :page, :start_number, :count
+  attr_accessor :page, :start_number, :count, :year
 
-  def initialize(start_number = 0, count = 200) #the max count is 200
+  def initialize(start_number = 0, count = 200, year) #the max count is 200
     @start_number = start_number.to_s
     @count = count.to_s
+    @year = year.to_s
     @page = JSON.parse(search.response.body)["search-results"]
   end
 
@@ -25,6 +26,7 @@ class ArticleResultPage
     URI.parse(search_config["host"] +
               search_config["path"] + "?" +
               "query=" + search_query + "&" +
+              "date=" + "#{self.year}" + "&" +
               "view=" + "COMPLETE" + "&" +
               "start=" + @start_number + "&" +
               "count=" + @count + "&" +

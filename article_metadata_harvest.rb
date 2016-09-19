@@ -4,21 +4,53 @@ class ArticleMetadataHarvest
   require 'byebug'
   require_relative 'article_result_page'
 
-  attr_accessor :count, :current_page, :number_of_pages, :page, :worksheet, :workbook, :p
+  attr_accessor :count,
+                :current_page,
+                :number_of_pages,
+                :number_of_results,
+                :page,
+                :year,
+                :worksheet,
+                :workbook,
+                :p
 
-  def initialize(page = 1, count = 200)
+  def initialize(page = 1, count = 200, year)  
     @p = Axlsx::Package.new
     @workbook = start_workbook
     @worksheet = start_worksheet
     add_header
-    @count = set_count(count)
+    @year = set_number(year)
+    @count = set_number(count)
     @current_page = page
-    @page = ArticleResultPage.new(start_number, count).page
+    @page = ArticleResultPage.new(start_number, self.count, self.year).page
+    @number_of_results = self.page["opensearch:totalResults"].to_i 
+    @number_of_pages = self.number_of_results / self.count.to_i
+  end
+
+  def next_year
+    self.year = (self.year.to_i + 1).to_s
+    self.current_page = 1
+    self.page = ArticleResultPage.new(start_number, self.count, self.year).page
+    self.number_of_results = self.page["opensearch:totalResults"].to_i 
+    self.number_of_pages = self.number_of_results / self.count.to_i
+  end
+
+  def can_print_year?
+    return true if self.number_of_pages <= 30
+    return false if self.number_of_pages > 30
+  end
+
+  def pages_remaining
+    self.number_of_pages - self.current_page
   end
 
   def next_page
+    if self.pages_remaining.zero?
+      puts "No pages remaining"
+      return
+    end
     @current_page += 1
-    @page = ArticleResultPage.new(start_number, count).page
+    @page = ArticleResultPage.new(start_number, count, self.year).page
   end
 
   def write_page
@@ -74,9 +106,10 @@ class ArticleMetadataHarvest
       { title: lambda { |result| result["dc:title"] } },
       { first_author: lambda { |result| result["dc:creator"] } },
       { all_authors: lambda do |result|
+        return nil if result["authors"].nil?
         result["authors"]["author"].collect do |author|
           "#{author["surname"]}, #{author["given-name"]}"
-        end.join(";")
+        end.join(";") 
       end },
       { publication_name: lambda { |result| result["prism:publicationName"] } },
       { aggregation_type: lambda { |result| result["prism:aggregationType"] } },
@@ -101,20 +134,12 @@ class ArticleMetadataHarvest
     ]
   end
 
-  def set_count(count)
-    count.to_s
+  def set_number(number)
+    number.to_s
   end
 
   def start_number
     # if count is 200, for page one: 0, for page two: 200
     (@current_page - 1) * @count.to_i
-  end
-
-  def get_page
-
-  end
-
-  def number_of_pages
-
   end
 end
